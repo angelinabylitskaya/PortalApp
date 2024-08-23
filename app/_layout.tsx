@@ -23,13 +23,11 @@ export default function RootLayout() {
     return null;
   }
 
-  if (!loaded) {
-    return null;
-  }
-
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="(root)" />
+      <Stack.Screen name="(auth)" />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
