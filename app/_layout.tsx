@@ -10,7 +10,8 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    PrimaryMedium: require("../assets/fonts/EtelkaMedium.otf"),
+    PrimaryText: require("../assets/fonts/EtelkaText.otf"),
   });
 
   useEffect(() => {
