@@ -1,10 +1,12 @@
-import { MaterialCommunityIcons, Octicons, Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { Drawer } from "expo-router/drawer";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import DrawerContent from "@/components/DrawerContent";
 import colors from "@/constants/colors";
-import DrawerHeader, { HeaderContextProvider } from "@/components/DrawerHeader";
+import NavigationHeader, {
+  HeaderContextProvider,
+} from "@/components/NavigationHeader";
 
 export default function TabsLayout() {
   return (
@@ -39,7 +41,7 @@ export default function TabsLayout() {
             headerTitleAlign: "left",
             headerStyle: {},
             headerTransparent: false,
-            header: (props) => <DrawerHeader {...props} />,
+            header: (props) => <NavigationHeader {...props} />,
             sceneContainerStyle: {
               backgroundColor: "#fff",
             },
@@ -52,7 +54,11 @@ export default function TabsLayout() {
               drawerLabel: "News",
               title: "News",
               drawerIcon: ({ focused, color, size }) => (
-                <Ionicons color={color} size={size} name="newspaper" />
+                <MaterialCommunityIcons
+                  color={color}
+                  size={size}
+                  name="newspaper-variant-multiple"
+                />
               ),
             }}
           />
@@ -76,7 +82,7 @@ export default function TabsLayout() {
               drawerLabel: "Locations",
               title: "Locations",
               drawerIcon: ({ focused, color, size }) => (
-                <Octicons color={color} size={size} name="location" />
+                <MaterialIcons color={color} size={size} name="place" />
               ),
             }}
           />

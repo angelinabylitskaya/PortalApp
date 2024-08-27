@@ -27,6 +27,7 @@ const InputField = ({
             className={`p-2 flex flex-row justify-start items-center relative ${containerStyle}`}
           >
             <TextInput
+              autoFocus
               className={`text-brand-100 font-PrimaryText w-100 text-[16px] flex-1 ${inputStyle} text-left`}
               secureTextEntry={secureTextEntry}
               {...props}

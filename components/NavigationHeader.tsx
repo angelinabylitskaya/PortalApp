@@ -5,20 +5,23 @@ import React, {
   useContext,
 } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DrawerHeaderProps } from "@react-navigation/drawer";
+import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { getHeaderTitle } from "@react-navigation/elements";
 
 import colors from "@/constants/colors";
 import InputField from "./InputField";
+import Text from "./Text";
+import { useRouter } from "expo-router";
 
-interface DrawerHeaderContextValue {
+interface NavigationHeaderContextValue {
   search: string;
   setSearch: Dispatch<SetStateAction<string>>;
 }
 
-const defaultContextValue: DrawerHeaderContextValue = {
+const defaultContextValue: NavigationHeaderContextValue = {
   search: "",
   setSearch: () => {},
 };
@@ -26,7 +29,7 @@ const defaultContextValue: DrawerHeaderContextValue = {
 const HeaderContext = React.createContext(defaultContextValue);
 
 export const useHeaderContext = () =>
-  useContext<DrawerHeaderContextValue>(HeaderContext);
+  useContext<NavigationHeaderContextValue>(HeaderContext);
 
 const getShowSearch = (routeName: string): boolean => routeName === "news";
 
@@ -47,12 +50,17 @@ export const HeaderContextProvider = ({ children }: PropsWithChildren) => {
 
 const iconStyle = "flex m-3 h-[48px] w-[48px] items-center justify-center m-0";
 
-export default function DrawerHeader(props: DrawerHeaderProps) {
+export default function NavigationHeader(
+  props: DrawerHeaderProps | NativeStackHeaderProps,
+) {
   const { top } = useSafeAreaInsets();
   const [searchActive, setSearchActive] = React.useState<boolean>(false);
   const { search, setSearch } = useHeaderContext();
   const title = getHeaderTitle(props.options, props.route.name);
   const showSearch = getShowSearch(props.route.name);
+  const router = useRouter();
+
+  const RightComponent = props.options.headerRight;
 
   return (
     <View className="bg-secondary-100" style={{ height: top + 64 }}>
@@ -60,12 +68,18 @@ export default function DrawerHeader(props: DrawerHeaderProps) {
         className="flex flex-row items-center h-[64px] bg-secondary-50 p-[8px]"
         style={{ marginTop: top }}
       >
-        {showSearch && searchActive ? (
+        {(showSearch && searchActive) ||
+        (props as NativeStackHeaderProps).options
+          .headerBackButtonMenuEnabled ? (
           <TouchableOpacity
             className={iconStyle}
             onPress={() => {
-              setSearch("");
-              setSearchActive(false);
+              if (showSearch && searchActive) {
+                setSearch("");
+                setSearchActive(false);
+              } else {
+                router.back();
+              }
             }}
           >
             <MaterialIcons
@@ -77,7 +91,7 @@ export default function DrawerHeader(props: DrawerHeaderProps) {
         ) : (
           <TouchableOpacity
             className={iconStyle}
-            onPress={props.navigation.toggleDrawer}
+            onPress={(props as DrawerHeaderProps).navigation.toggleDrawer}
           >
             <MaterialIcons color={colors.brand["700"]} size={24} name="menu" />
           </TouchableOpacity>
@@ -91,7 +105,7 @@ export default function DrawerHeader(props: DrawerHeaderProps) {
               onChangeText={(value) => setSearch(value)}
             />
           ) : (
-            <Text className="font-PrimaryMedium text-[20px] text-left">
+            <Text h5Medium className="text-left">
               {title}
             </Text>
           )}
@@ -124,6 +138,8 @@ export default function DrawerHeader(props: DrawerHeaderProps) {
         ) : (
           <></>
         )}
+
+        {RightComponent && <RightComponent canGoBack={false} />}
       </View>
     </View>
   );
