@@ -3,6 +3,7 @@ import React, {
   PropsWithChildren,
   SetStateAction,
   useContext,
+  useEffect,
 } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { View, TouchableOpacity } from "react-native";
@@ -10,20 +11,28 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DrawerHeaderProps } from "@react-navigation/drawer";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { getHeaderTitle } from "@react-navigation/elements";
+import { usePathname, useRouter } from "expo-router";
 
 import colors from "@/constants/colors";
 import InputField from "./InputField";
 import Text from "./Text";
-import { useRouter } from "expo-router";
 
 interface NavigationHeaderContextValue {
   search: string;
   setSearch: Dispatch<SetStateAction<string>>;
+
+  searchActive: boolean;
+  openSearch: () => void;
+  closeSearch: () => void;
 }
 
 const defaultContextValue: NavigationHeaderContextValue = {
   search: "",
   setSearch: () => {},
+
+  searchActive: false,
+  openSearch: () => {},
+  closeSearch: () => {},
 };
 
 const HeaderContext = React.createContext(defaultContextValue);
@@ -35,12 +44,28 @@ const getShowSearch = (routeName: string): boolean => routeName === "news";
 
 export const HeaderContextProvider = ({ children }: PropsWithChildren) => {
   const [search, setSearch] = React.useState<string>("");
+  const [searchActive, setSearchActive] = React.useState<boolean>(false);
+  const pathname = usePathname();
+
+  const openSearch = () => setSearchActive(true);
+
+  const closeSearch = () => {
+    setSearchActive(false);
+    setSearch("");
+  };
+
+  useEffect(() => {
+    closeSearch();
+  }, [pathname]);
 
   return (
     <HeaderContext.Provider
       value={{
         search,
         setSearch,
+        searchActive,
+        openSearch,
+        closeSearch,
       }}
     >
       {children}
@@ -54,8 +79,8 @@ export default function NavigationHeader(
   props: DrawerHeaderProps | NativeStackHeaderProps,
 ) {
   const { top } = useSafeAreaInsets();
-  const [searchActive, setSearchActive] = React.useState<boolean>(false);
-  const { search, setSearch } = useHeaderContext();
+  const { search, setSearch, searchActive, openSearch, closeSearch } =
+    useHeaderContext();
   const title = getHeaderTitle(props.options, props.route.name);
   const showSearch = getShowSearch(props.route.name);
   const router = useRouter();
@@ -75,8 +100,7 @@ export default function NavigationHeader(
             className={iconStyle}
             onPress={() => {
               if (showSearch && searchActive) {
-                setSearch("");
-                setSearchActive(false);
+                closeSearch();
               } else {
                 router.back();
               }
@@ -126,7 +150,7 @@ export default function NavigationHeader(
           ) : (
             <TouchableOpacity
               className={iconStyle}
-              onPress={() => setSearchActive(true)}
+              onPress={() => openSearch()}
             >
               <MaterialIcons
                 color={colors.brand["700"]}

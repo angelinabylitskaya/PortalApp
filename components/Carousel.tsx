@@ -47,10 +47,10 @@ export default function Carousel<T>({ data, renderItem }: CarouselProps<T>) {
               activeIndex > 1
                 ? activeIndex < slidesCount - 2
                   ? 2
-                  : maxDotsCount - slidesCount + activeIndex
+                  : maxDots - slidesCount + activeIndex
                 : activeIndex;
             const isSmall =
-              maxDots >= maxDotsCount &&
+              slidesCount > maxDotsCount &&
               ((index === 0 && activeIndex > 1) ||
                 (index === maxDots - 1 && activeDotIndex < maxDots - 2));
             return (
