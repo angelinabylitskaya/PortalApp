@@ -32,13 +32,16 @@ export default function NewsCard({ news, full, onPress }: NewsCardProps) {
             >
               {news.title}
             </Text>
-            <View className="flex flex-row">
+            <View className="flex-row items-center">
               <Text helperText className="text-secondary-400">
                 Written by{" "}
               </Text>
               <TouchableWithoutFeedback>
-                <TouchableOpacity>
-                  <Text helperText className="text-secondary-400 underline">
+                <TouchableOpacity className="grow">
+                  <Text
+                    helperText
+                    className="text-secondary-400 underline h-[14px]"
+                  >
                     {news.creatorName}
                   </Text>
                 </TouchableOpacity>

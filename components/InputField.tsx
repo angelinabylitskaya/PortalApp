@@ -24,7 +24,7 @@ const InputField = ({
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="my-2 grow">
           <View
-            className={`p-2 flex flex-row justify-start items-center relative ${containerStyle}`}
+            className={`p-1 flex flex-row justify-start items-center relative ${containerStyle}`}
           >
             <TextInput
               autoFocus

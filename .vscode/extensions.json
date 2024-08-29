@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "streetsidesoftware.code-spell-checker",
+        "trinm1709.dracula-theme-from-intellij",
+        "dbaeumer.vscode-eslint",
+        "eamodio.gitlens",
+        "isudox.vscode-jetbrains-keybindings",
+        "shd101wyy.markdown-preview-enhanced",
+        "pkief.material-icon-theme",
+        "esbenp.prettier-vscode"
+    ]
+}
