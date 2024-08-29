@@ -10,7 +10,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import Text from "./Text";
-import { News } from "@/types/news";
+import { News } from "@/models/news";
 import newsImage from "@/assets/images/icon.png";
 import colors from "@/constants/colors";
 import Carousel from "./Carousel";
@@ -23,75 +23,82 @@ type NewsCardProps = { news: News; full?: boolean } & PressableProps;
 export default function NewsCard({ news, full, onPress }: NewsCardProps) {
   return (
     <Pressable onPress={onPress}>
-      <View className="bg-brand-200 pt-6 pb-4">
-        <View className="pb-4 px-4">
-          <Text h5Medium className="pb-2">
-            {news.title}
-          </Text>
-          <View className="flex flex-row">
-            <Text helperText className="text-secondary-400">
-              Written by{" "}
+      {({ pressed }) => (
+        <View className="bg-brand-200 pt-6 pb-4">
+          <View className="pb-4 px-4">
+            <Text
+              h5Medium
+              className={`pb-2 ${!!onPress && pressed ? "text-brand-100" : ""}`}
+            >
+              {news.title}
             </Text>
-            <TouchableWithoutFeedback>
-              <TouchableOpacity>
-                <Text helperText className="text-secondary-400 underline">
-                  {news.creatorName}
-                </Text>
-              </TouchableOpacity>
-            </TouchableWithoutFeedback>
+            <View className="flex flex-row">
+              <Text helperText className="text-secondary-400">
+                Written by{" "}
+              </Text>
+              <TouchableWithoutFeedback>
+                <TouchableOpacity>
+                  <Text helperText className="text-secondary-400 underline">
+                    {news.creatorName}
+                  </Text>
+                </TouchableOpacity>
+              </TouchableWithoutFeedback>
+            </View>
+            <Text helperText className="text-secondary-400">
+              Tuesday, 09 July 2024, 17:22
+            </Text>
           </View>
-          <Text helperText className="text-secondary-400">
-            Tuesday, 09 July 2024, 17:22
-          </Text>
+          <View>
+            {news.images.length > 1 ? (
+              <Carousel
+                data={news.images}
+                renderItem={({ index }) => (
+                  <Image
+                    source={newsImage}
+                    className="w-full"
+                    style={{ height: width * 0.6 }}
+                  />
+                )}
+              />
+            ) : (
+              <Image
+                source={newsImage}
+                className="w-full"
+                style={{ height: width * 0.6 }}
+              />
+            )}
+          </View>
+          <View className="px-4 py-2">
+            <Text
+              body2
+              {...(full
+                ? {}
+                : { numberOfLines: maxLinesCount, ellipsizeMode: "tail" })}
+              className="pb-2"
+            >
+              {news.description}
+            </Text>
+            {!full && (
+              <TouchableWithoutFeedback>
+                <TouchableOpacity className="flex flex-row gap-1 items-center">
+                  <Text subtitle1 className="text-secondary-300">
+                    {news.likes}
+                  </Text>
+                  <MaterialCommunityIcons
+                    name="cards-heart"
+                    size={24}
+                    color={
+                      news.isLiked
+                        ? colors.brand["100"]
+                        : colors.secondary["300"]
+                    }
+                  />
+                </TouchableOpacity>
+              </TouchableWithoutFeedback>
+            )}
+          </View>
         </View>
-        <View>
-          {news.images.length > 1 ? (
-            <Carousel
-              data={news.images}
-              renderItem={({ index }) => (
-                <Image
-                  source={newsImage}
-                  className="w-full"
-                  style={{ height: width * 0.6 }}
-                />
-              )}
-            />
-          ) : (
-            <Image
-              source={newsImage}
-              className="w-full"
-              style={{ height: width * 0.6 }}
-            />
-          )}
-        </View>
-        <View className="px-4 py-2">
-          <Text
-            body2
-            {...(full
-              ? {}
-              : { numberOfLines: maxLinesCount, ellipsizeMode: "tail" })}
-            className="pb-2"
-          >
-            {news.description}
-          </Text>
-          {!full && (
-            <TouchableWithoutFeedback>
-              <TouchableOpacity className="flex flex-row gap-1 items-center">
-                <Text subtitle1 className="text-secondary-300">
-                  {news.likes}
-                </Text>
-                <MaterialCommunityIcons
-                  name="cards-heart"
-                  size={24}
-                  color={
-                    news.isLiked ? colors.brand["100"] : colors.secondary["300"]
-                  }
-                />
-              </TouchableOpacity>
-            </TouchableWithoutFeedback>
-          )}
-        </View>
-      </View>
+      )}
     </Pressable>
   );
 }
