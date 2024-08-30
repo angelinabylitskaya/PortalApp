@@ -1,8 +1,20 @@
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 
+import LoadingView from "@/components/LoadingView";
 import NavigationHeader from "@/components/NavigationHeader";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 export default function RootLayout() {
+  const { userLoaded, isAuthenticated } = useAuthContext();
+
+  if (!userLoaded) {
+    return <LoadingView />;
+  }
+
+  if (userLoaded && !isAuthenticated) {
+    return <Redirect href="/(auth)/sign-in" />;
+  }
+
   return (
     <Stack
       screenOptions={{

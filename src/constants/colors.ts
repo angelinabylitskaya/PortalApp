@@ -1,3 +1,4 @@
 const colors = require("./_colors");
 
-export default colors;
+// eslint-disable-next-line no-undef
+export default colors as Colors;

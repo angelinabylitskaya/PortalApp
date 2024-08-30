@@ -5,6 +5,9 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 
+import LoadingView from "@/components/LoadingView";
+import AuthContextProvider from "@/contexts/AuthContext";
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -21,15 +24,17 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <LoadingView />;
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="(root)" />
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="+not-found" />
-    </Stack>
+    <AuthContextProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(root)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    </AuthContextProvider>
   );
 }

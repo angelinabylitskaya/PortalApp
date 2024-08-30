@@ -8,9 +8,9 @@
         "^react-native(.*)$",
         "^@?expo(.*)$",
         "^firebase/(.*)$",
-        "^@/components/(.*)$",
+        "^@/components|contexts/(.*)$",
         "^@/services/(.*)$",
-        "^@/constants|models/(.*)$",
+        "^@/constants|models(.*)$",
         "^@/assets/(.*)$",
         "^[./]"
     ],
