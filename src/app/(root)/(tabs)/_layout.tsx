@@ -1,12 +1,14 @@
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { Drawer } from "expo-router/drawer";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Drawer } from "expo-router/drawer";
+
 import DrawerContent from "@/components/DrawerContent";
-import colors from "@/constants/colors";
 import NavigationHeader, {
   HeaderContextProvider,
 } from "@/components/NavigationHeader";
+
+import colors from "@/constants/colors";
 
 export default function TabsLayout() {
   return (

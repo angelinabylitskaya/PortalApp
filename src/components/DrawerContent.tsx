@@ -1,10 +1,11 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
 import { View, Text, Image } from "react-native";
+
+import { MaterialIcons } from "@expo/vector-icons";
 
 import profileImage from "@/assets/images/icon.png";
 

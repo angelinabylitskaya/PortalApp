@@ -1,11 +1,11 @@
 import {
-  TextInput,
-  View,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
   Platform,
+  TextInput,
   TextInputProps,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 
 const InputField = ({

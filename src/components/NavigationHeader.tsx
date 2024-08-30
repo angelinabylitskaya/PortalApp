@@ -1,3 +1,6 @@
+import { DrawerHeaderProps } from "@react-navigation/drawer";
+import { getHeaderTitle } from "@react-navigation/elements";
+import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import React, {
   Dispatch,
   PropsWithChildren,
@@ -5,15 +8,14 @@ import React, {
   useContext,
   useEffect,
 } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
 import { View, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { DrawerHeaderProps } from "@react-navigation/drawer";
-import { NativeStackHeaderProps } from "@react-navigation/native-stack";
-import { getHeaderTitle } from "@react-navigation/elements";
+
+import { MaterialIcons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 
 import colors from "@/constants/colors";
+
 import InputField from "./InputField";
 import Text from "./Text";
 

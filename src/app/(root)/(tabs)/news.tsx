@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -6,17 +7,18 @@ import {
   Pressable,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+
+import { useHeaderContext } from "@/components/NavigationHeader";
 import NewsCard from "@/components/NewsCard";
 import Text from "@/components/Text";
-import { News, NewsType } from "@/models/news";
-import { headerHeight, tabsHeight } from "@/constants/sizes";
+
 import colors from "@/constants/colors";
-import { useHeaderContext } from "@/components/NavigationHeader";
+import { headerHeight, tabsHeight } from "@/constants/sizes";
+import { News, NewsType } from "@/models/news";
 
 const height = Dimensions.get("screen").height;
 

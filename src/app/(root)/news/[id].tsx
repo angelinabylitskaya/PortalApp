@@ -1,9 +1,11 @@
+import React, { useState } from "react";
 import { Pressable, ScrollView } from "react-native";
 
-import NewsCard from "@/components/NewsCard";
-import { useNavigation } from "expo-router";
-import React, { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "expo-router";
+
+import NewsCard from "@/components/NewsCard";
+
 import colors from "@/constants/colors";
 import { News, NewsType } from "@/models/news";
 

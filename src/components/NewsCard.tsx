@@ -7,13 +7,16 @@ import {
   Dimensions,
   Image,
 } from "react-native";
+
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import Text from "./Text";
-import { News } from "@/models/news";
-import newsImage from "@/assets/images/icon.png";
 import colors from "@/constants/colors";
+import { News } from "@/models/news";
+
+import newsImage from "@/assets/images/icon.png";
+
 import Carousel from "./Carousel";
+import Text from "./Text";
 
 const maxLinesCount = 3;
 const width = Dimensions.get("window").width;
@@ -55,7 +58,7 @@ export default function NewsCard({ news, full, onPress }: NewsCardProps) {
             {news.images.length > 1 ? (
               <Carousel
                 data={news.images}
-                renderItem={({ index }) => (
+                renderItem={() => (
                   <Image
                     source={newsImage}
                     className="w-full"

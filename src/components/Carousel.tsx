@@ -56,7 +56,9 @@ export default function Carousel<T>({ data, renderItem }: CarouselProps<T>) {
             return (
               <View
                 key={index}
-                className={`${isSmall ? "h-1 w-1" : "h-1.5 w-1.5"} rounded ${activeDotIndex === index ? "bg-brand-100" : "bg-secondary-300"}`}
+                className={`${isSmall ? "h-1 w-1" : "h-1.5 w-1.5"} rounded ${
+                  activeDotIndex === index ? "bg-brand-100" : "bg-secondary-300"
+                }`}
               ></View>
             );
           })}
