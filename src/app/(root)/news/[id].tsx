@@ -1,33 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView } from "react-native";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 
+import LoadingView from "@/components/LoadingView";
 import NewsCard from "@/components/NewsCard";
+
+import { getNews } from "@/services/news-service";
 
 import colors from "@/constants/colors";
 import { News, NewsType } from "@/models/news";
 
-const mockNews: News = {
-  id: "1",
-  title: "BA SUMMER CAMP 2024",
-  description: `Dear Colleagues,
-Following the success of the previous camps in 2022 and 2023, and in response to your requests, we are delighted to announce the Business Analysis Summer Camp 2024! We are excited to offer another opportunity this summer to enhance your knowledge and skills in business analysis and requirements engineering through practical exercises and interactive workshops.
-This camp is an opportunity to connect with fellow professionals, exchange ideas, and learn in a supportive environment. We look forward to your participation in the Business Analysis Summer Camp 2024!
-If you're interested in joining the camp, please reach out to Olga Orlenok.`,
-  images: ["", "", "", "", "", "", "", "", "", ""],
-  dateCreated: Date.now(),
-  creatorName: "Oksana Borisenko",
-  creatorId: "0",
-  likes: 2,
-  isLiked: false,
-  type: NewsType.EventCoverage,
-};
-
 export default function NewsPage() {
+  const [news, setNews] = useState<News | undefined>(undefined);
   const [liked, setLiked] = useState<boolean>(false);
   const navigation = useNavigation();
+  const { id } = useLocalSearchParams();
+
+  useEffect(() => {
+    getNews(id as string).then((news) => {
+      setNews(news!);
+    });
+  }, [id]);
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -43,9 +38,13 @@ export default function NewsPage() {
     });
   }, [navigation, liked]);
 
+  if (!news) {
+    return <LoadingView />;
+  }
+
   return (
     <ScrollView className="flex-1 bg-brand-200">
-      <NewsCard full news={mockNews} />
+      <NewsCard full news={news} />
     </ScrollView>
   );
 }
