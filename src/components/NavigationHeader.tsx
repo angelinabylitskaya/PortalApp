@@ -95,26 +95,18 @@ export default function NavigationHeader(
         className="flex flex-row items-center h-[64px] bg-secondary-50 p-[8px]"
         style={{ marginTop: top }}
       >
-        {(showSearch && searchActive) ||
-        (props as NativeStackHeaderProps).options
-          .headerBackButtonMenuEnabled ? (
-          <TouchableOpacity
-            className={iconStyle}
-            onPress={() => {
-              if (showSearch && searchActive) {
-                closeSearch();
-              } else {
-                router.back();
-              }
-            }}
-          >
+        {(props as NativeStackHeaderProps).options
+          .headerBackButtonMenuEnabled && (
+          <TouchableOpacity className={iconStyle} onPress={router.back}>
             <MaterialIcons
               color={colors.brand["700"]}
               size={24}
               name="arrow-back"
             />
           </TouchableOpacity>
-        ) : (
+        )}
+
+        {!searchActive && (
           <TouchableOpacity
             className={iconStyle}
             onPress={(props as DrawerHeaderProps).navigation.toggleDrawer}
@@ -126,9 +118,32 @@ export default function NavigationHeader(
         <View className="grow">
           {showSearch && searchActive ? (
             <InputField
+              autoFocus
+              search
               placeholder="Search"
               value={search}
               onChangeText={(value) => setSearch(value)}
+              PrefixIcon={(props) => (
+                <TouchableOpacity className={iconStyle} onPress={closeSearch}>
+                  <MaterialIcons
+                    name="arrow-back"
+                    {...props}
+                    color={colors.brand["700"]}
+                  />
+                </TouchableOpacity>
+              )}
+              PostfixIcon={(props) => (
+                <TouchableOpacity
+                  className={iconStyle}
+                  onPress={() => setSearch("")}
+                >
+                  <MaterialIcons
+                    {...props}
+                    color={colors.brand["700"]}
+                    name="close"
+                  />
+                </TouchableOpacity>
+              )}
             />
           ) : (
             <Text h5Medium className="text-left">
@@ -137,32 +152,14 @@ export default function NavigationHeader(
           )}
         </View>
 
-        {showSearch ? (
-          search.trim().length ? (
-            <TouchableOpacity
-              className={iconStyle}
-              onPress={() => setSearch("")}
-            >
-              <MaterialIcons
-                color={colors.brand["700"]}
-                size={24}
-                name="close"
-              />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              className={iconStyle}
-              onPress={() => openSearch()}
-            >
-              <MaterialIcons
-                color={colors.brand["700"]}
-                size={24}
-                name="search"
-              />
-            </TouchableOpacity>
-          )
-        ) : (
-          <></>
+        {showSearch && !searchActive && (
+          <TouchableOpacity className={iconStyle} onPress={() => openSearch()}>
+            <MaterialIcons
+              color={colors.brand["700"]}
+              size={24}
+              name="search"
+            />
+          </TouchableOpacity>
         )}
 
         {RightComponent && <RightComponent canGoBack={false} />}

@@ -6,10 +6,21 @@ import {
 import { View, Text, Image } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+
+import { useAuthContext } from "@/contexts/AuthContext";
 
 import profileImage from "@/assets/images/icon.png";
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
+  const { signOut } = useAuthContext();
+  const router = useRouter();
+
+  const logOut = async () => {
+    await signOut();
+    router.replace("/(auth)/sign-in");
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <DrawerContentScrollView {...props}>
@@ -21,7 +32,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
             />
             <Text className="text-lg font-PrimaryText">Anton Karpuk</Text>
           </View>
-          <MaterialIcons size={24} name="logout" />
+          <MaterialIcons size={24} name="logout" onPress={() => logOut()} />
         </View>
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
