@@ -1,3 +1,5 @@
+import { filterNews } from "@/utils/news-utils";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,70 +18,11 @@ import { useHeaderContext } from "@/components/NavigationHeader";
 import NewsCard from "@/components/NewsCard";
 import Text from "@/components/Text";
 
+import { getAllNews } from "@/services/news-service";
+
 import colors from "@/constants/colors";
 import { headerHeight, tabsHeight } from "@/constants/sizes";
 import { News, NewsType } from "@/models/news";
-
-const height = Dimensions.get("screen").height;
-
-const mockNews: News[] = [
-  {
-    id: "0",
-    title: "SUMMER PARRTY FOLLOW-UP (CL)",
-    description:
-      "We are excited to share photos from our incredible HiQo summer parties! We look forward to the upcoming celebrations! HiQo Summer Party 2024",
-    images: ["", "", "", "", "", "", "", "", "", "", "", "", ""],
-    dateCreated: Date.now(),
-    creatorName: "Oksana Borisenko",
-    creatorId: "0",
-    likes: 3,
-    isLiked: true,
-    type: NewsType.CompanyLife,
-  },
-  {
-    id: "1",
-    title: "BA SUMMER CAMP 2024 (EC)",
-    description: `Dear Colleagues,
-Following the success of the previous camps in 2022 and 2023, and in response to your requests, we are delighted to announce the Business Analysis Summer Camp 2024! We are excited to offer another opportunity this summer to enhance your knowledge and skills in business analysis and requirements engineering through practical exercises and interactive workshops.
-This camp is an opportunity to connect with fellow professionals, exchange ideas, and learn in a supportive environment. We look forward to your participation in the Business Analysis Summer Camp 2024!
-If you're interested in joining the camp, please reach out to Olga Orlenok.`,
-    images: [""],
-    dateCreated: Date.now(),
-    creatorName: "Oksana Borisenko",
-    creatorId: "0",
-    likes: 2,
-    isLiked: false,
-    type: NewsType.EventCoverage,
-  },
-  {
-    id: "2",
-    title: "SAY HELLO TO OUR NEW EMBEDDED TRAINER - WOJCIECH NOWORYTA (NC)",
-    description: `Dear colleagues! Wojciech Noworyta has joined HiQo Solutions as an Embedded Trainer! Here is what he has written about himself: My name is Wojciech. I graduated from Technical University of Wroclaw, the Faculty of Electronic. I worked as an academic teacher, dealing mainly with computer architecture and embedded programming. Then I worked in a private company as a hardware and firmware designer. I remain passionate about the intersection of electronics and embedded code. Beyond my professional interests I enjoy some activities like sailing, scuba diving, dancing and skiing.
-Please, join us in welcoming!`,
-    images: [""],
-    dateCreated: Date.now(),
-    creatorName: "Oksana Borisenko",
-    creatorId: "0",
-    likes: 2,
-    isLiked: false,
-    type: NewsType.Newcomers,
-  },
-];
-
-const hasSearchString = ({ title, description }: News, search: string) =>
-  search
-    ? title.toLowerCase().includes(search.toLocaleLowerCase()) ||
-      description.toLowerCase().includes(search.toLocaleLowerCase())
-    : true;
-
-const getNews = (type: NewsType, search: string) =>
-  type === NewsType.All
-    ? search
-      ? mockNews.filter((news) => hasSearchString(news, search))
-      : mockNews
-    : mockNews.filter(
-        (news) => news.type === type && hasSearchString(news, search),
-      );
 
 interface NewsTab {
   name: string;
@@ -95,6 +38,8 @@ const tabs: NewsTab[] = [
 
 export default function NewsList() {
   const router = useRouter();
+  const [allNews, setAllNews] = useState<News[]>([]);
+  const [allNewsLoading, setAllNewsLoading] = useState<boolean>(true);
   const [data, setData] = useState<News[]>([]);
   const [filterKey, setFilterKey] = useState<NewsType>(NewsType.All);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -103,25 +48,35 @@ export default function NewsList() {
   const newsRef = useRef<FlatList>(null);
   const tabsRef = useRef<FlatList>(null);
   const { top } = useSafeAreaInsets();
+  const height = Dimensions.get("screen").height;
   const listHeight = height - headerHeight - tabsHeight - top;
 
   let timeoutId: ReturnType<typeof setTimeout>;
 
   useEffect(() => {
+    getAllNews().then((news) => {
+      setAllNews(news);
+      setData(filterNews(news, filterKey, ""));
+      setAllNewsLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (allNewsLoading) return;
     setLoading(true);
     if (!search.trim()) {
-      setData(getNews(filterKey, ""));
+      setData(filterNews(allNews, filterKey, ""));
       setLoading(false);
     } else {
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
       timeoutId = setTimeout(() => {
-        setData(getNews(filterKey, search));
+        setData(filterNews(allNews, filterKey, search));
         setLoading(false);
       }, 500);
     }
-  }, [search, filterKey]);
+  }, [search, filterKey, allNewsLoading]);
 
   const handleTabChange = (item: NewsTab, index: number) => {
     if (item.key === filterKey) return;
@@ -160,9 +115,11 @@ export default function NewsList() {
 
   const handleRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => {
+    getAllNews().then((news) => {
+      setAllNews(news);
+      setData(filterNews(news, filterKey, ""));
       setRefreshing(false);
-    }, 2000);
+    });
   };
 
   return (
@@ -213,7 +170,7 @@ export default function NewsList() {
               style={{ height: listHeight }}
             >
               <Text h3 className="text-secondary-400">
-                No News
+                {search.trim().length ? "RESULTS NOT FOUND" : "No News"}
               </Text>
             </View>
           )}

@@ -88,6 +88,8 @@ export default function NavigationHeader(
   const router = useRouter();
 
   const RightComponent = props.options.headerRight;
+  const showBack = (props as NativeStackHeaderProps).options
+    .headerBackButtonMenuEnabled;
 
   return (
     <View className="bg-secondary-100" style={{ height: top + 64 }}>
@@ -95,8 +97,7 @@ export default function NavigationHeader(
         className="flex flex-row items-center h-[64px] bg-secondary-50 p-[8px]"
         style={{ marginTop: top }}
       >
-        {(props as NativeStackHeaderProps).options
-          .headerBackButtonMenuEnabled && (
+        {showBack && (
           <TouchableOpacity className={iconStyle} onPress={router.back}>
             <MaterialIcons
               color={colors.brand["700"]}
@@ -106,7 +107,7 @@ export default function NavigationHeader(
           </TouchableOpacity>
         )}
 
-        {!searchActive && (
+        {!searchActive && !showBack && (
           <TouchableOpacity
             className={iconStyle}
             onPress={(props as DrawerHeaderProps).navigation.toggleDrawer}

@@ -1,3 +1,5 @@
+import { dateToLongString } from "@/utils/date";
+
 import {
   View,
   TouchableOpacity,
@@ -51,7 +53,7 @@ export default function NewsCard({ news, full, onPress }: NewsCardProps) {
               </TouchableWithoutFeedback>
             </View>
             <Text helperText className="text-secondary-400">
-              Tuesday, 09 July 2024, 17:22
+              {dateToLongString(news.dateCreated)}
             </Text>
           </View>
           <View>
