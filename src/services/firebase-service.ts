@@ -8,6 +8,7 @@ import {
   getFirestore,
   QueryDocumentSnapshot,
   SnapshotOptions,
+  updateDoc,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -43,4 +44,15 @@ export const getDocument = async <T extends DocumentData>(
     doc(db, path).withConverter(converter),
   );
   return { ...(snapshot.data() as T), id: snapshot.id };
+};
+
+export const updateDocument = async <T extends DocumentData>(
+  path: string,
+  data: Partial<T>,
+  converter: FirestoreDataConverter<T> = defaultConverter,
+): Promise<void> => {
+  await updateDoc<T, DocumentData>(
+    doc(db, path).withConverter(converter),
+    data,
+  );
 };

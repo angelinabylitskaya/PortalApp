@@ -1,5 +1,6 @@
-import { dateToLongString } from "@/utils/date";
+import { useUpdateNewsQuery } from "@/queries/news-query";
 
+import { useEffect, useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -11,6 +12,10 @@ import {
 } from "react-native";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import { arrayRemove, arrayUnion } from "firebase/firestore";
+
+import { useAuthContext } from "@/contexts/AuthContext";
 
 import colors from "@/constants/colors";
 import { News } from "@/models/news";
@@ -26,6 +31,25 @@ const width = Dimensions.get("window").width;
 type NewsCardProps = { news: News; full?: boolean } & PressableProps;
 
 export default function NewsCard({ news, full, onPress }: NewsCardProps) {
+  const { user } = useAuthContext();
+  const userId = user!.uid;
+  const newsMutation = useUpdateNewsQuery(news.id);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsLiked(news.likes.includes(userId));
+  }, [userId, news?.likes]);
+
+  const toggleLike = () => {
+    const dbValue = news.likes.includes(userId)
+      ? arrayRemove(userId)
+      : arrayUnion(userId);
+    setIsLiked(!isLiked);
+    newsMutation.mutate({
+      likes: dbValue,
+    });
+  };
+
   return (
     <Pressable onPress={onPress}>
       {({ pressed }) => (
@@ -53,7 +77,7 @@ export default function NewsCard({ news, full, onPress }: NewsCardProps) {
               </TouchableWithoutFeedback>
             </View>
             <Text helperText className="text-secondary-400">
-              {dateToLongString(news.dateCreated)}
+              {news.dateCreatedString}
             </Text>
           </View>
           <View>
@@ -88,17 +112,18 @@ export default function NewsCard({ news, full, onPress }: NewsCardProps) {
             </Text>
             {!full && (
               <TouchableWithoutFeedback>
-                <TouchableOpacity className="flex flex-row gap-1 items-center">
+                <TouchableOpacity
+                  className="flex flex-row gap-1 items-center"
+                  onPress={toggleLike}
+                >
                   <Text subtitle1 className="text-secondary-300">
-                    {news.likes}
+                    {news.likes.length}
                   </Text>
                   <MaterialCommunityIcons
                     name="cards-heart"
                     size={24}
                     color={
-                      news.isLiked
-                        ? colors.brand["100"]
-                        : colors.secondary["300"]
+                      isLiked ? colors.brand["100"] : colors.secondary["300"]
                     }
                   />
                 </TouchableOpacity>

@@ -1,3 +1,5 @@
+import { dateToLongString } from "@/utils/date";
+
 import { DocumentData, serverTimestamp, Timestamp } from "firebase/firestore";
 
 export enum NewsType {
@@ -13,10 +15,10 @@ export class News {
   description!: string;
   images!: string[];
   dateCreated!: Date;
+  dateCreatedString!: string;
   creatorName!: string;
   creatorId!: string;
-  likes!: number;
-  isLiked!: boolean;
+  likes!: string[];
   type!: NewsType;
 
   constructor(data: DocumentData) {
@@ -25,10 +27,10 @@ export class News {
     this.description = data.description || "";
     this.images = data.images || [];
     this.dateCreated = (data.dateCreated as Timestamp)?.toDate();
+    this.dateCreatedString = dateToLongString(this.dateCreated);
     this.creatorName = data.creatorName;
     this.creatorId = data.creatorId;
-    this.likes = data.likes || 0;
-    this.isLiked = !!data.isLiked;
+    this.likes = data.likes || [];
     this.type = data.type || NewsType.EventCoverage;
   }
 
@@ -40,8 +42,7 @@ export class News {
       dateCreated: serverTimestamp(),
       creatorName: this.creatorName,
       creatorId: this.creatorId,
-      likes: this.likes || 0,
-      isLiked: !!this.isLiked,
+      likes: this.likes || [],
       type: this.type,
     };
   }
