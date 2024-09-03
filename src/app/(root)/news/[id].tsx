@@ -1,50 +1,63 @@
-import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView } from "react-native";
+import { useNewsQuery, useUpdateNewsQuery } from "@/queries/news-query";
+
+import { useCallback, useEffect, useState } from "react";
+import { TouchableOpacity, ScrollView } from "react-native";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 
+import { arrayRemove, arrayUnion } from "firebase/firestore";
+
 import LoadingView from "@/components/LoadingView";
 import NewsCard from "@/components/NewsCard";
-
-import { getNews } from "@/services/news-service";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 import colors from "@/constants/colors";
-import { News, NewsType } from "@/models/news";
 
 export default function NewsPage() {
-  const [news, setNews] = useState<News | undefined>(undefined);
-  const [liked, setLiked] = useState<boolean>(false);
-  const navigation = useNavigation();
   const { id } = useLocalSearchParams();
+  const { data: news, isLoading } = useNewsQuery(id as string);
+  const navigation = useNavigation();
+  const { user } = useAuthContext();
+  const userId = user!.uid;
+  const newsMutation = useUpdateNewsQuery(id as string);
+
+  const [isLiked, setIsLiked] = useState<boolean>(false);
 
   useEffect(() => {
-    getNews(id as string).then((news) => {
-      setNews(news!);
-    });
-  }, [id]);
+    setIsLiked(!!news?.likes?.includes(userId));
+  }, [news?.likes]);
 
-  React.useEffect(() => {
+  const toggleLike = () => {
+    setIsLiked(!isLiked);
+
+    const dbValue = isLiked ? arrayRemove(userId) : arrayUnion(userId);
+    newsMutation.mutate({
+      likes: dbValue,
+    });
+  };
+
+  useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Pressable className="pr-2" onPress={() => setLiked(!liked)}>
+        <TouchableOpacity className="pr-2" onPress={toggleLike}>
           <MaterialCommunityIcons
-            name={liked ? "cards-heart" : "cards-heart-outline"}
+            name={isLiked ? "cards-heart" : "cards-heart-outline"}
             size={24}
             color={colors.secondary["300"]}
           />
-        </Pressable>
+        </TouchableOpacity>
       ),
     });
-  }, [navigation, liked]);
+  }, [navigation, isLiked]);
 
-  if (!news) {
+  if (isLoading) {
     return <LoadingView />;
   }
 
   return (
     <ScrollView className="flex-1 bg-brand-200">
-      <NewsCard full news={news} />
+      <NewsCard full news={news!} />
     </ScrollView>
   );
 }

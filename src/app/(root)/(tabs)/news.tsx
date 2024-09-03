@@ -1,6 +1,7 @@
+import { useAllNewsQuery } from "@/queries/news-query";
 import { filterNews } from "@/utils/news-utils";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -17,8 +18,6 @@ import { useRouter } from "expo-router";
 import { useHeaderContext } from "@/components/NavigationHeader";
 import NewsCard from "@/components/NewsCard";
 import Text from "@/components/Text";
-
-import { getAllNews } from "@/services/news-service";
 
 import colors from "@/constants/colors";
 import { headerHeight, tabsHeight } from "@/constants/sizes";
@@ -38,45 +37,17 @@ const tabs: NewsTab[] = [
 
 export default function NewsList() {
   const router = useRouter();
-  const [allNews, setAllNews] = useState<News[]>([]);
-  const [allNewsLoading, setAllNewsLoading] = useState<boolean>(true);
-  const [data, setData] = useState<News[]>([]);
   const [filterKey, setFilterKey] = useState<NewsType>(NewsType.All);
-  const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const { search, closeSearch } = useHeaderContext();
+
   const newsRef = useRef<FlatList>(null);
   const tabsRef = useRef<FlatList>(null);
   const { top } = useSafeAreaInsets();
   const height = Dimensions.get("screen").height;
   const listHeight = height - headerHeight - tabsHeight - top;
 
-  let timeoutId: ReturnType<typeof setTimeout>;
-
-  useEffect(() => {
-    getAllNews().then((news) => {
-      setAllNews(news);
-      setData(filterNews(news, filterKey, ""));
-      setAllNewsLoading(false);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (allNewsLoading) return;
-    setLoading(true);
-    if (!search.trim()) {
-      setData(filterNews(allNews, filterKey, ""));
-      setLoading(false);
-    } else {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      timeoutId = setTimeout(() => {
-        setData(filterNews(allNews, filterKey, search));
-        setLoading(false);
-      }, 500);
-    }
-  }, [search, filterKey, allNewsLoading]);
+  const { data, isPending, refetch, isRefetching } = useAllNewsQuery();
+  const news = filterNews(data || [], filterKey, search);
 
   const handleTabChange = (item: NewsTab, index: number) => {
     if (item.key === filterKey) return;
@@ -113,15 +84,6 @@ export default function NewsList() {
     </Pressable>
   );
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    getAllNews().then((news) => {
-      setAllNews(news);
-      setData(filterNews(news, filterKey, ""));
-      setRefreshing(false);
-    });
-  };
-
   return (
     <View className="flex relative">
       <View className="shrink-0 bg-secondary-50">
@@ -139,7 +101,7 @@ export default function NewsList() {
         />
       </View>
 
-      {loading ? (
+      {isPending ? (
         <View
           className="flex items-center justify-center"
           style={{ height: listHeight }}
@@ -150,14 +112,14 @@ export default function NewsList() {
         <FlatList
           ref={newsRef}
           style={{ height: listHeight }}
-          data={data}
+          data={news}
           renderItem={renderItem}
           keyExtractor={({ id }) => id}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           maxToRenderPerBatch={5}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
+          refreshing={isRefetching}
+          onRefresh={refetch}
           contentContainerStyle={{
             paddingBottom: 24,
           }}
