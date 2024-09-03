@@ -13,6 +13,7 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import profileImage from "@/assets/images/icon.png";
 
 export default function DrawerContent(props: DrawerContentComponentProps) {
+  const { user } = useAuthContext();
   const { signOut } = useAuthContext();
   const router = useRouter();
 
@@ -30,7 +31,9 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
               source={profileImage}
               className="w-12 h-12 border-secondary-100 border"
             />
-            <Text className="text-lg font-PrimaryText">Anton Karpuk</Text>
+            <Text className="text-lg font-PrimaryText">
+              {user?.displayName}
+            </Text>
           </View>
           <MaterialIcons size={24} name="logout" onPress={() => logOut()} />
         </View>

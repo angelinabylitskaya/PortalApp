@@ -10,7 +10,7 @@
         "^firebase/(.*)$",
         "^@?tanstack/(.*)$",
         "^@/components|contexts/(.*)$",
-        "^@/services/(.*)$",
+        "^@/services|queries(.*)$",
         "^@/constants|models(.*)$",
         "^@/assets/(.*)$",
         "^[./]"
