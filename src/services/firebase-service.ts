@@ -1,3 +1,4 @@
+import { initializeApp } from "firebase/app";
 import {
   collection,
   doc,
@@ -9,7 +10,16 @@ import {
   QueryDocumentSnapshot,
   SnapshotOptions,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
+
+import { firebaseConfig } from "@/constants/firebase-config";
+
+try {
+  initializeApp(firebaseConfig);
+} catch (e) {
+  console.log(e);
+}
 
 const db = getFirestore();
 
@@ -55,4 +65,11 @@ export const updateDocument = async <T extends DocumentData>(
     doc(db, path).withConverter(converter),
     data,
   );
+};
+
+export const setDocument = async (
+  path: string,
+  data: DocumentData,
+): Promise<void> => {
+  await setDoc<DocumentData, DocumentData>(doc(db, path), data);
 };

@@ -3,7 +3,7 @@ import { Image, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
@@ -12,28 +12,26 @@ import { useAuthContext } from "@/contexts/AuthContext";
 
 import Logo from "@/assets/images/logo-sm.png";
 
-export default function SignIn() {
+export default function SignUp() {
   const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const { signIn } = useAuthContext();
-  const router = useRouter();
+  const { signUp } = useAuthContext();
 
-  const login = async () => {
+  const register = async () => {
     try {
       setLoading(true);
       setError("");
 
-      if (!email.trim() || !password.trim()) {
+      if (!email.trim() || !password.trim() || !name.trim()) {
         throw new Error();
       }
 
-      await signIn(email, password);
-      router.push("/(root)/(tabs)/news");
+      await signUp(name, email, password);
     } catch {
-      setError("Invalid Email or Password");
-    } finally {
+      setError("Invalid Field Value");
       setLoading(false);
     }
   };
@@ -48,6 +46,16 @@ export default function SignIn() {
 
       <View className="grow my-16 w-full">
         <View className="mb-2">
+          <InputField
+            value={name}
+            placeholder="Display Name"
+            label="Display Name"
+            PrefixIcon={(props) => <MaterialIcons name="person" {...props} />}
+            onChangeText={setName}
+            hint={error}
+            error={!!error}
+            autoCapitalize="none"
+          />
           <InputField
             value={email}
             placeholder="Email"
@@ -79,13 +87,13 @@ export default function SignIn() {
         </View>
       </View>
 
-      <Button title="Log in" onPress={login} />
+      <Button title="Register" onPress={register} />
       <Link
         replace
-        href="/(auth)/sign-up"
+        href="/(auth)/sign-in"
         className="font-PrimaryText mt-4 underline"
       >
-        Don't have an account?
+        Already a user?
       </Link>
     </SafeAreaView>
   );
