@@ -1,7 +1,4 @@
-import { useAllNewsQuery } from "@/queries/news-query";
-import { filterNews } from "@/utils/news-utils";
-
-import { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -12,12 +9,17 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
+import Button from "@/components/Button";
 import { useHeaderContext } from "@/components/NavigationHeader";
 import NewsCard from "@/components/NewsCard";
 import Text from "@/components/Text";
+import { useAuthContext } from "@/contexts/AuthContext";
+
+import { useAllNewsQuery } from "@/queries/news-query";
+import { filterNews } from "@/utils/news-utils";
 
 import colors from "@/constants/colors";
 import { headerHeight, tabsHeight } from "@/constants/sizes";
@@ -39,6 +41,7 @@ export default function NewsList() {
   const router = useRouter();
   const [filterKey, setFilterKey] = useState<NewsType>(NewsType.All);
   const { search, closeSearch } = useHeaderContext();
+  const { isAdmin } = useAuthContext();
 
   const newsRef = useRef<FlatList>(null);
   const tabsRef = useRef<FlatList>(null);
@@ -136,6 +139,18 @@ export default function NewsList() {
               </Text>
             </View>
           )}
+          ListHeaderComponent={() =>
+            isAdmin && (
+              <View className="items-end">
+                <Button
+                  secondary
+                  title="Add News"
+                  Prefix={(props) => <MaterialIcons name="add" {...props} />}
+                  onPress={() => router.navigate("/(root)/add-news")}
+                />
+              </View>
+            )
+          }
         />
       )}
 

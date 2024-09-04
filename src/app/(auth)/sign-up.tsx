@@ -87,7 +87,7 @@ export default function SignUp() {
         </View>
       </View>
 
-      <Button title="Register" onPress={register} />
+      <Button className="w-full" title="Register" onPress={register} />
       <Link
         replace
         href="/(auth)/sign-in"

@@ -11,6 +11,9 @@ import {
   SnapshotOptions,
   updateDoc,
   setDoc,
+  addDoc,
+  query,
+  orderBy,
 } from "firebase/firestore";
 
 import { firebaseConfig } from "@/constants/firebase-config";
@@ -40,9 +43,9 @@ export const getDocuments = async <T extends DocumentData>(
   path: string,
   converter: FirestoreDataConverter<T> = defaultConverter,
 ): Promise<T[]> => {
-  const snapshots = await getDocs<T, DocumentData>(
-    collection(db, path).withConverter(converter),
-  );
+  const collectionRef = collection(db, path).withConverter(converter);
+  const documentsQuery = query(collectionRef, orderBy("dateCreated", "desc"));
+  const snapshots = await getDocs<T, DocumentData>(documentsQuery);
   return snapshots.docs.map((snap) => ({ ...snap.data(), id: snap.id }) as T);
 };
 
@@ -65,6 +68,17 @@ export const updateDocument = async <T extends DocumentData>(
     doc(db, path).withConverter(converter),
     data,
   );
+};
+
+export const createDocument = async (
+  path: string,
+  data: DocumentData,
+): Promise<string> => {
+  const ref = await addDoc<DocumentData, DocumentData>(
+    collection(db, path),
+    data,
+  );
+  return ref.id;
 };
 
 export const setDocument = async (

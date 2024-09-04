@@ -2,9 +2,12 @@ import { DocumentData } from "firebase/firestore";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getAllNews, updateNews } from "@/services/news-service";
-
-import { News } from "@/models";
+import {
+  createNews,
+  getAllNews,
+  getNews,
+  updateNews,
+} from "@/services/news-service";
 
 import { QueryKeys } from "./keys";
 
@@ -15,14 +18,9 @@ export const useAllNewsQuery = () =>
   });
 
 export const useNewsQuery = (newsId: string) => {
-  const queryClient = useQueryClient();
   return useQuery({
     queryKey: [QueryKeys.News, { id: newsId }],
-    queryFn: () => {
-      const news = queryClient.getQueryData<News[]>([QueryKeys.News]) || [];
-      return news.find(({ id }) => id === newsId);
-    },
-    enabled: !!queryClient.getQueryData([QueryKeys.News]),
+    queryFn: () => getNews(newsId),
   });
 };
 
@@ -30,6 +28,18 @@ export const useUpdateNewsQuery = (newsId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (update: DocumentData) => updateNews(newsId, update),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.News],
+      });
+    },
+  });
+};
+
+export const useCreateNewsQuery = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: DocumentData) => createNews(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.News],

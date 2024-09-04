@@ -24,12 +24,29 @@ export default function RootLayout() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="profile" />
       <Stack.Screen
-        name="news/[id]"
+        name="add-news"
+        options={{
+          title: "Add News",
+          presentation: "modal",
+          headerShown: true,
+          headerBackButtonMenuEnabled: true,
+        }}
+      />
+      <Stack.Screen
+        name="news/[id]/index"
         options={{
           title: "All News",
           headerShown: true,
           headerBackButtonMenuEnabled: true,
           header: (props) => <NavigationHeader {...props} />,
+        }}
+      />
+      <Stack.Screen
+        name="news/[id]/edit"
+        options={{
+          title: "Edit News",
+          headerShown: true,
+          presentation: "modal",
         }}
       />
     </Stack>

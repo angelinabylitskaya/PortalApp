@@ -35,6 +35,7 @@ interface AuthContextValue {
   user: UserInfo | null;
   isAuthenticated: boolean;
   userLoaded: boolean;
+  isAdmin: boolean;
 
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
@@ -45,6 +46,7 @@ const defaultContextValue: AuthContextValue = {
   user: null,
   isAuthenticated: false,
   userLoaded: false,
+  isAdmin: false,
 
   signIn: async () => {},
   signUp: async () => {},
@@ -105,6 +107,7 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
     setValue({
       user: null,
       isAuthenticated: false,
+      isAdmin: false,
       userLoaded: true,
     });
     await signOut(auth);
@@ -122,6 +125,7 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
       },
       isAuthenticated: true,
       userLoaded: true,
+      isAdmin: !!user.isAdmin,
     });
   }, [user]);
 
