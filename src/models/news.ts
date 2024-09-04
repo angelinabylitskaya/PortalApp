@@ -1,6 +1,7 @@
-import { dateToLongString } from "@/utils/date";
-
 import { DocumentData, serverTimestamp, Timestamp } from "firebase/firestore";
+
+import { dateToLongString } from "@/utils/date";
+import { removeEmptyFields } from "@/utils/remove-empty-fields";
 
 export enum NewsType {
   All = "all",
@@ -26,16 +27,16 @@ export class News {
     this.title = data.title || "";
     this.description = data.description || "";
     this.images = data.images || [];
-    this.dateCreated = (data.dateCreated as Timestamp)?.toDate();
+    this.dateCreated = (data.dateCreated as Timestamp)?.toDate() || new Date();
     this.dateCreatedString = dateToLongString(this.dateCreated);
-    this.creatorName = data.creatorName;
-    this.creatorId = data.creatorId;
+    this.creatorName = data.creatorName || "";
+    this.creatorId = data.creatorId || "";
     this.likes = data.likes || [];
     this.type = data.type || NewsType.EventCoverage;
   }
 
   toDocumentData(): DocumentData {
-    return {
+    return removeEmptyFields({
       title: this.title || "",
       description: this.description || "",
       images: this.images || [],
@@ -44,6 +45,6 @@ export class News {
       creatorId: this.creatorId,
       likes: this.likes || [],
       type: this.type,
-    };
+    });
   }
 }

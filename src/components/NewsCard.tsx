@@ -1,5 +1,3 @@
-import { useUpdateNewsQuery } from "@/queries/news-query";
-
 import { useEffect, useState } from "react";
 import {
   View,
@@ -16,6 +14,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { arrayRemove, arrayUnion } from "firebase/firestore";
 
 import { useAuthContext } from "@/contexts/AuthContext";
+
+import { useUpdateNewsQuery } from "@/queries/news-query";
 
 import colors from "@/constants/colors";
 import { News } from "@/models/news";
@@ -49,6 +49,8 @@ export default function NewsCard({ news, full, onPress }: NewsCardProps) {
       likes: dbValue,
     });
   };
+
+  const getImageSource = (url: string) => (url ? { uri: url } : newsImage);
 
   return (
     <Pressable onPress={onPress}>
@@ -84,9 +86,9 @@ export default function NewsCard({ news, full, onPress }: NewsCardProps) {
             {news.images.length > 1 ? (
               <Carousel
                 data={news.images}
-                renderItem={() => (
+                renderItem={({ item }) => (
                   <Image
-                    source={newsImage}
+                    source={{ uri: item as string }}
                     className="w-full"
                     style={{ height: width * 0.6 }}
                   />
@@ -94,9 +96,10 @@ export default function NewsCard({ news, full, onPress }: NewsCardProps) {
               />
             ) : (
               <Image
-                source={newsImage}
+                source={getImageSource(news.images[0])}
                 className="w-full"
                 style={{ height: width * 0.6 }}
+                resizeMode="cover"
               />
             )}
           </View>

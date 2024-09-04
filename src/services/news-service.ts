@@ -6,7 +6,12 @@ import {
 
 import { News } from "@/models";
 
-import { getDocument, getDocuments, updateDocument } from "./firebase-service";
+import {
+  createDocument,
+  getDocument,
+  getDocuments,
+  updateDocument,
+} from "./firebase-service";
 
 const newsConverter = {
   toFirestore(news: News): DocumentData {
@@ -31,4 +36,8 @@ export const getNews = (id: string) => {
 
 export const updateNews = async (id: string, data: Partial<News>) => {
   await updateDocument(`news/${id}`, data, newsConverter);
+};
+
+export const createNews = async (data: Partial<News>): Promise<string> => {
+  return createDocument("news", data);
 };
