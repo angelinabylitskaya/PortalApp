@@ -20,7 +20,7 @@ import { useUpdateNewsQuery } from "@/queries/news-query";
 import colors from "@/constants/colors";
 import { News } from "@/models/news";
 
-import newsImage from "@/assets/images/icon.png";
+import newsImage from "@/assets/images/placeholder.png";
 
 import Carousel from "./Carousel";
 import Text from "./Text";

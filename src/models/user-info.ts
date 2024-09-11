@@ -3,4 +3,5 @@ export interface UserInfo {
   displayName: string;
   email: string;
   isAdmin?: boolean;
+  pushId?: string;
 }

@@ -7,6 +7,10 @@ import {
   useState,
 } from "react";
 
+import Constants from "expo-constants";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+
 import { initializeApp } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
@@ -31,7 +35,12 @@ try {
   console.log(e);
 }
 
-interface AuthContextValue {
+type PushNotificationData = {
+  title: string;
+  body: string;
+};
+
+type AuthContextValue = {
   user: UserInfo | null;
   isAuthenticated: boolean;
   userLoaded: boolean;
@@ -40,7 +49,8 @@ interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-}
+  sendPushNotification: (data: PushNotificationData) => Promise<void>;
+};
 
 const defaultContextValue: AuthContextValue = {
   user: null,
@@ -51,6 +61,7 @@ const defaultContextValue: AuthContextValue = {
   signIn: async () => {},
   signUp: async () => {},
   signOut: async () => {},
+  sendPushNotification: async () => {},
 };
 
 const AuthContext = createContext(defaultContextValue);
@@ -58,6 +69,36 @@ const AuthContext = createContext(defaultContextValue);
 export const useAuthContext = () => useContext(AuthContext);
 
 const auth = getAuth();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+async function sendPushNotification(
+  data: PushNotificationData,
+  expoPushToken: string,
+) {
+  const message = {
+    ...data,
+    to: expoPushToken,
+    sound: "default",
+    data: { someData: "goes here" },
+  };
+
+  await fetch("https://exp.host/--/api/v2/push/send", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Accept-encoding": "gzip, deflate",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(message),
+  });
+}
 
 export default function AuthContextProvider({ children }: PropsWithChildren) {
   const [uid, setUid] = useState<string | undefined>();
@@ -67,6 +108,7 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
     );
   const createMutation = useCreateUserQuery();
   const { data: user } = useUserQuery(uid || "");
+  const pushToken = (user as UserInfo)?.pushId || "";
 
   const signIn = async (email: string, password: string) => {
     if (!email?.trim() || !password?.trim()) {
@@ -95,7 +137,27 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
       displayName: name.trim(),
       email: authUser.email!,
       uid: authUser.uid!,
-    };
+    } as UserInfo;
+
+    console.log("Device.isDevice", Device.isDevice);
+    if (Device.isDevice) {
+      try {
+        const projectId =
+          Constants?.expoConfig?.extra?.eas?.projectId ??
+          Constants?.easConfig?.projectId;
+        const pushTokenString = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId,
+          })
+        ).data;
+
+        console.log("pushTokenString", pushTokenString);
+        userInfo.pushId = pushTokenString;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
     createMutation.mutate(userInfo, {
       onSuccess: () => {
         setUid(userInfo.uid);
@@ -105,6 +167,7 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
 
   const logOut = async () => {
     setValue({
+      ...defaultContextValue,
       user: null,
       isAuthenticated: false,
       isAdmin: false,
@@ -118,6 +181,7 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
     if (!user) return;
 
     setValue({
+      ...value,
       user: {
         displayName: user.displayName!,
         email: user.email!,
@@ -151,6 +215,8 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
         signIn,
         signUp,
         signOut: logOut,
+        sendPushNotification: (data: PushNotificationData) =>
+          sendPushNotification(data, pushToken),
       }}
     >
       {children}

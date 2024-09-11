@@ -3,7 +3,9 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
+  KeyboardAvoidingView,
   ListRenderItem,
+  Platform,
   Pressable,
   View,
 } from "react-native";
@@ -88,7 +90,11 @@ export default function NewsList() {
   );
 
   return (
-    <View className="flex relative">
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={100}
+      className="flex relative"
+    >
       <View className="shrink-0 bg-secondary-50">
         <FlatList
           horizontal
@@ -164,6 +170,6 @@ export default function NewsList() {
           name="arrow-up"
         />
       </Pressable>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

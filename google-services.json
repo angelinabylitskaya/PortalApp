@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "394441535463",
+    "project_id": "test-5d8d4",
+    "storage_bucket": "test-5d8d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:394441535463:android:07e6bf9b593292b5301742",
+        "android_client_info": {
+          "package_name": "com.angie.bylitskaya.hiqoportal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8nmogaKKDQVmkMHfVjJoWynT6YWnlUtI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

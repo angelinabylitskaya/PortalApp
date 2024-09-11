@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { Image, View } from "react-native";
+import {
+  KeyboardAwareScrollView,
+  KeyboardToolbar,
+} from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MaterialIcons } from "@expo/vector-icons";
@@ -41,60 +45,69 @@ export default function SignUp() {
   }
 
   return (
-    <SafeAreaView className="px-4 pt-16 pb-2 flex-1 flex-column items-center">
-      <Image source={Logo} className="w-[72px]" resizeMode="contain" />
-
-      <View className="grow my-16 w-full">
-        <View className="mb-2">
-          <InputField
-            value={name}
-            placeholder="Display Name"
-            label="Display Name"
-            PrefixIcon={(props) => <MaterialIcons name="person" {...props} />}
-            onChangeText={setName}
-            hint={error}
-            error={!!error}
-            autoCapitalize="none"
-          />
-          <InputField
-            value={email}
-            placeholder="Email"
-            label="Email"
-            PrefixIcon={(props) => (
-              <MaterialIcons name="mail-outline" {...props} />
-            )}
-            onChangeText={setEmail}
-            autoComplete="email"
-            inputMode="email"
-            keyboardType="email-address"
-            hint={error}
-            error={!!error}
-            autoCapitalize="none"
-          />
-        </View>
-
-        <View>
-          <InputField
-            value={password}
-            placeholder="Password"
-            label="Password"
-            secureTextEntry
-            PrefixIcon={(props) => <MaterialIcons name="key" {...props} />}
-            onChangeText={setPassword}
-            hint={error}
-            error={!!error}
-          />
-        </View>
-      </View>
-
-      <Button className="w-full" title="Register" onPress={register} />
-      <Link
-        replace
-        href="/(auth)/sign-in"
-        className="font-PrimaryText mt-4 underline"
+    <SafeAreaView className="flex-1">
+      <KeyboardAwareScrollView
+        disableScrollOnKeyboardHide
+        bottomOffset={62}
+        style={{
+          flex: 1,
+        }}
+        contentContainerStyle={{
+          flex: 1,
+        }}
       >
-        Already a user?
-      </Link>
+        <View className="px-4 pt-16 pb-2 flex-1 items-center">
+          <Image source={Logo} className="w-[72px]" resizeMode="contain" />
+
+          <View className="grow my-16 w-full">
+            <InputField
+              value={name}
+              placeholder="Display Name"
+              label="Display Name"
+              PrefixIcon={(props) => <MaterialIcons name="person" {...props} />}
+              onChangeText={setName}
+              hint={error}
+              error={!!error}
+              autoCapitalize="none"
+            />
+            <InputField
+              value={email}
+              placeholder="Email"
+              label="Email"
+              PrefixIcon={(props) => (
+                <MaterialIcons name="mail-outline" {...props} />
+              )}
+              onChangeText={setEmail}
+              autoComplete="email"
+              inputMode="email"
+              keyboardType="email-address"
+              hint={error}
+              error={!!error}
+              autoCapitalize="none"
+            />
+            <InputField
+              value={password}
+              placeholder="Password"
+              label="Password"
+              secureTextEntry
+              PrefixIcon={(props) => <MaterialIcons name="key" {...props} />}
+              onChangeText={setPassword}
+              hint={error}
+              error={!!error}
+            />
+          </View>
+
+          <Button className="w-full" title="Register" onPress={register} />
+          <Link
+            replace
+            href="/(auth)/sign-in"
+            className="font-PrimaryText my-4 underline"
+          >
+            Already a user?
+          </Link>
+        </View>
+      </KeyboardAwareScrollView>
+      <KeyboardToolbar />
     </SafeAreaView>
   );
 }

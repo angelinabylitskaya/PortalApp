@@ -30,6 +30,7 @@ export default function DrawerContent(props: DrawerContentComponentProps) {
             <Image
               source={profileImage}
               className="w-12 h-12 border-secondary-100 border"
+              resizeMode="contain"
             />
             <Text className="text-lg font-PrimaryText">
               {user?.displayName}

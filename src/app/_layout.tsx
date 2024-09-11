@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import "react-native-reanimated";
 
 import { useFonts } from "expo-font";
@@ -34,12 +35,14 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthContextProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(root)" />
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <KeyboardProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(root)" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </KeyboardProvider>
       </AuthContextProvider>
     </QueryClientProvider>
   );
