@@ -1,4 +1,3 @@
-import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createContext,
   PropsWithChildren,
@@ -11,7 +10,7 @@ import Constants from "expo-constants";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 
-import { initializeApp } from "firebase/app";
+import { getApp } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -19,21 +18,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 
 import { useCreateUserQuery, useUserQuery } from "@/queries/users-query";
 
-import { firebaseConfig } from "@/constants/firebase-config";
 import { UserInfo } from "@/models";
-
-try {
-  const app = initializeApp(firebaseConfig);
-  initializeAuth(app, {
-    persistence: getReactNativePersistence(ReactNativeAsyncStorage),
-  });
-} catch (e) {
-  console.log(e);
-}
 
 type PushNotificationData = {
   title: string;
@@ -69,8 +57,6 @@ const defaultContextValue: AuthContextValue = {
 const AuthContext = createContext(defaultContextValue);
 
 export const useAuthContext = () => useContext(AuthContext);
-
-const auth = getAuth();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -115,6 +101,7 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
   const createMutation = useCreateUserQuery();
   const { data: user } = useUserQuery(uid || "");
   const [pushToken, setPushToken] = useState<string>("");
+  const auth = getAuth(getApp("webApp"));
 
   const signIn = async (email: string, password: string) => {
     if (!email?.trim() || !password?.trim()) {

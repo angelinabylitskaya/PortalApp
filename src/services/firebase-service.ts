@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { getApp } from "firebase/app";
 import {
   collection,
   doc,
@@ -15,16 +15,6 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-
-import { firebaseConfig } from "@/constants/firebase-config";
-
-try {
-  initializeApp(firebaseConfig);
-} catch (e) {
-  console.log(e);
-}
-
-const db = getFirestore();
 
 const defaultConverter: FirestoreDataConverter<any, DocumentData> = {
   toFirestore(data: any): DocumentData {
@@ -43,6 +33,7 @@ export const getDocuments = async <T extends DocumentData>(
   path: string,
   converter: FirestoreDataConverter<T> = defaultConverter,
 ): Promise<T[]> => {
+  const db = getFirestore(getApp("webApp"));
   const collectionRef = collection(db, path).withConverter(converter);
   const documentsQuery = query(collectionRef, orderBy("dateCreated", "desc"));
   const snapshots = await getDocs<T, DocumentData>(documentsQuery);
@@ -53,6 +44,7 @@ export const getDocument = async <T extends DocumentData>(
   path: string,
   converter: FirestoreDataConverter<T> = defaultConverter,
 ): Promise<T | undefined> => {
+  const db = getFirestore(getApp("webApp"));
   const snapshot = await getDoc<T, DocumentData>(
     doc(db, path).withConverter(converter),
   );
@@ -64,6 +56,7 @@ export const updateDocument = async <T extends DocumentData>(
   data: Partial<T>,
   converter: FirestoreDataConverter<T> = defaultConverter,
 ): Promise<void> => {
+  const db = getFirestore(getApp("webApp"));
   await updateDoc<T, DocumentData>(
     doc(db, path).withConverter(converter),
     data,
@@ -74,6 +67,7 @@ export const createDocument = async (
   path: string,
   data: DocumentData,
 ): Promise<string> => {
+  const db = getFirestore(getApp("webApp"));
   const ref = await addDoc<DocumentData, DocumentData>(
     collection(db, path),
     data,
@@ -85,5 +79,6 @@ export const setDocument = async (
   path: string,
   data: DocumentData,
 ): Promise<void> => {
+  const db = getFirestore(getApp("webApp"));
   await setDoc<DocumentData, DocumentData>(doc(db, path), data);
 };
