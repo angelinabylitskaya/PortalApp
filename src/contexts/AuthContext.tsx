@@ -45,6 +45,7 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   userLoaded: boolean;
   isAdmin: boolean;
+  notificationsAvailable: boolean;
 
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
@@ -57,6 +58,7 @@ const defaultContextValue: AuthContextValue = {
   isAuthenticated: false,
   userLoaded: false,
   isAdmin: false,
+  notificationsAvailable: false,
 
   signIn: async () => {},
   signUp: async () => {},
@@ -89,15 +91,19 @@ async function sendPushNotification(
     data: { someData: "goes here" },
   };
 
-  await fetch("https://exp.host/--/api/v2/push/send", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Accept-encoding": "gzip, deflate",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(message),
-  });
+  try {
+    const res = await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Accept-encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(message),
+    });
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export default function AuthContextProvider({ children }: PropsWithChildren) {
@@ -108,13 +114,17 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
     );
   const createMutation = useCreateUserQuery();
   const { data: user } = useUserQuery(uid || "");
-  const pushToken = (user as UserInfo)?.pushId || "";
+  const [pushToken, setPushToken] = useState<string>("");
 
   const signIn = async (email: string, password: string) => {
     if (!email?.trim() || !password?.trim()) {
       throw new Error("Invalid email or password");
     }
 
+    setValue({
+      ...value,
+      userLoaded: false,
+    });
     const { user: userInfo } = await signInWithEmailAndPassword(
       auth,
       email.trim().toLowerCase(),
@@ -128,6 +138,10 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
       throw new Error("Invalid name, email or password");
     }
 
+    setValue({
+      ...value,
+      userLoaded: false,
+    });
     const { user: authUser } = await createUserWithEmailAndPassword(
       auth,
       email.trim().toLowerCase(),
@@ -138,25 +152,6 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
       email: authUser.email!,
       uid: authUser.uid!,
     } as UserInfo;
-
-    console.log("Device.isDevice", Device.isDevice);
-    if (Device.isDevice) {
-      try {
-        const projectId =
-          Constants?.expoConfig?.extra?.eas?.projectId ??
-          Constants?.easConfig?.projectId;
-        const pushTokenString = (
-          await Notifications.getExpoPushTokenAsync({
-            projectId,
-          })
-        ).data;
-
-        console.log("pushTokenString", pushTokenString);
-        userInfo.pushId = pushTokenString;
-      } catch (e) {
-        console.log(e);
-      }
-    }
 
     createMutation.mutate(userInfo, {
       onSuccess: () => {
@@ -171,10 +166,17 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
       user: null,
       isAuthenticated: false,
       isAdmin: false,
-      userLoaded: true,
+      userLoaded: false,
     });
     await signOut(auth);
     setUid(undefined);
+    setValue({
+      ...defaultContextValue,
+      user: null,
+      isAuthenticated: false,
+      isAdmin: false,
+      userLoaded: true,
+    });
   };
 
   useEffect(() => {
@@ -191,6 +193,35 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
       userLoaded: true,
       isAdmin: !!user.isAdmin,
     });
+
+    if (!pushToken) {
+      setValue({
+        ...value,
+        user: {
+          displayName: user.displayName!,
+          email: user.email!,
+          uid: user.uid!,
+        },
+        isAuthenticated: true,
+        userLoaded: true,
+        isAdmin: !!user.isAdmin,
+      });
+
+      if (Device.isDevice) {
+        const projectId =
+          Constants?.expoConfig?.extra?.eas?.projectId ??
+          Constants?.easConfig?.projectId;
+        Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+          .then(({ data }) => {
+            setPushToken(data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    }
   }, [user]);
 
   useEffect(() => {
@@ -215,6 +246,7 @@ export default function AuthContextProvider({ children }: PropsWithChildren) {
         signIn,
         signUp,
         signOut: logOut,
+        notificationsAvailable: !!pushToken,
         sendPushNotification: (data: PushNotificationData) =>
           sendPushNotification(data, pushToken),
       }}

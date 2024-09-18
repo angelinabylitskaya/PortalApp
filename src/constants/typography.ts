@@ -1,4 +1,6 @@
-export const typography = {
+import { TextStyle } from "react-native";
+
+export const typography: { [type: string]: TextStyle } = {
   h1: {
     fontFamily: "PrimaryMedium",
     fontSize: 38,
@@ -118,5 +120,12 @@ export const typography = {
     fontSize: 13,
     lineHeight: 20,
     letterSpacing: 0.7,
+  },
+  link: {
+    fontFamily: "PrimaryText",
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0,
+    textDecorationLine: "underline",
   },
 };

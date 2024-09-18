@@ -9,6 +9,8 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
+android
+ios
 
 # macOS
 .DS_Store
@@ -22,3 +24,4 @@ expo-env.d.ts
 .env
 
 firebaseadmin-sdk.json
+build-*.apk

@@ -1,8 +1,6 @@
 import { ReactNode, useState } from "react";
 import {
   Keyboard,
-  KeyboardAvoidingView,
-  Platform,
   TextInput,
   TextInputProps,
   TouchableWithoutFeedback,

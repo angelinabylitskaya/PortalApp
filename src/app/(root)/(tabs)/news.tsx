@@ -17,6 +17,7 @@ import { useRouter } from "expo-router";
 import Button from "@/components/Button";
 import { useHeaderContext } from "@/components/NavigationHeader";
 import NewsCard from "@/components/NewsCard";
+import Tabs from "@/components/Tabs";
 import Text from "@/components/Text";
 import { useAuthContext } from "@/contexts/AuthContext";
 
@@ -72,23 +73,6 @@ export default function NewsList() {
     [router],
   );
 
-  const renderTabItem: ListRenderItem<NewsTab> = ({ item, index }) => (
-    <Pressable
-      className="px-4 items-center justify-center relative"
-      onPress={() => handleTabChange(item, index)}
-    >
-      <Text
-        className={`${item.key === filterKey ? "text-brand-100" : ""}`}
-        subtitle2
-      >
-        {item.name}
-      </Text>
-      {item.key === filterKey && (
-        <View className="h-[3px] bg-brand-100 absolute bottom-0 left-4 right-4"></View>
-      )}
-    </Pressable>
-  );
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -96,17 +80,11 @@ export default function NewsList() {
       className="flex relative"
     >
       <View className="shrink-0 bg-secondary-50">
-        <FlatList
-          horizontal
-          ref={tabsRef}
-          extraData={filterKey}
+        <Tabs
           data={tabs}
           keyExtractor={({ key }) => key}
-          showsHorizontalScrollIndicator={false}
-          renderItem={renderTabItem}
-          contentContainerStyle={{
-            height: tabsHeight,
-          }}
+          renderTabItemLabel={(item) => item.name}
+          onTabChange={handleTabChange}
         />
       </View>
 

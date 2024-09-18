@@ -9,11 +9,12 @@
         "^@?expo(.*)$",
         "^firebase/(.*)$",
         "^@?tanstack/(.*)$",
+        "^@?gorhom/(.*)$",
         "^@/components|contexts/(.*)$",
         "^@/services|queries|utils(.*)$",
         "^@/constants|models(.*)$",
         "^@/assets/(.*)$",
-        "^[./]"
+        "^.*"
     ],
     "importOrderSeparation": true
 }
